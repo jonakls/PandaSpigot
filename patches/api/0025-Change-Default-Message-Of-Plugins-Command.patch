@@ -1,0 +1,103 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: jonakls <asmot54@hotmail.com>
+Date: Fri, 9 Jun 2023 03:10:32 -0500
+Subject: [PATCH] Change Default Message Of Plugins Command
+
+
+diff --git a/src/main/java/org/bukkit/command/defaults/PluginsCommand.java b/src/main/java/org/bukkit/command/defaults/PluginsCommand.java
+index 6f2eef45b72dc68668aa214cc21a08997b477eb5..5f0c3ffe8a75184d7f8c12c7e49205eb50de0f96 100644
+--- a/src/main/java/org/bukkit/command/defaults/PluginsCommand.java
++++ b/src/main/java/org/bukkit/command/defaults/PluginsCommand.java
+@@ -8,6 +8,9 @@ import org.bukkit.command.CommandSender;
+ import org.bukkit.plugin.Plugin;
+ // PandaSpigot start - Improved plugins command
+ import java.util.TreeMap;
++// Jonakls start - Improved plugins command
++import java.util.concurrent.atomic.AtomicInteger;
++// Jonakls end
+ import net.md_5.bungee.api.chat.ComponentBuilder;
+ import net.md_5.bungee.api.chat.BaseComponent;
+ import net.md_5.bungee.api.chat.HoverEvent;
+@@ -40,6 +43,7 @@ public class PluginsCommand extends BukkitCommand {
+     }
+ 
+     // PandaSpigot start - Improved plugins command
++    // Jonakls start - Improved plugins command
+     /**
+      * Formats the plugin list to be sent to a player.
+      *
+@@ -54,30 +58,43 @@ public class PluginsCommand extends BukkitCommand {
+             plugins.put(plugin.getDescription().getName(), plugin);
+         }
+         
+-        ComponentBuilder builder = new ComponentBuilder("Plugins (" + plugins.size() + "): ");
+-    
+-        java.util.List<Plugin> values = new java.util.ArrayList<>(plugins.values());
+-        for (int i = 0; i < values.size(); i++) {
+-            Plugin plugin = values.get(i);
++        ComponentBuilder builder = new ComponentBuilder("----------------------------------");
++        builder
++            .color(net.md_5.bungee.api.ChatColor.GRAY)
++            .strikethrough(true)
++            .append("\n")
++            .append("Plugins: " + plugins.size() + " loaded", ComponentBuilder.FormatRetention.NONE)
++            .color(net.md_5.bungee.api.ChatColor.GOLD)
++            .append("\n")
++            .append("----------------------------------")
++            .color(net.md_5.bungee.api.ChatColor.GRAY)
++            .strikethrough(true)
++            .append("\n")
++            .append("List of plugins: ")
++            .color(net.md_5.bungee.api.ChatColor.GOLD);
++
++        final AtomicInteger count = new AtomicInteger(0);
++        plugins.forEach((name, plugin) -> {
+             PluginDescriptionFile description = plugin.getDescription();
+-    
++
+             builder
+                     .append(description.getName(), ComponentBuilder.FormatRetention.NONE)
+                     .color(plugin.isEnabled() ? net.md_5.bungee.api.ChatColor.GREEN : net.md_5.bungee.api.ChatColor.RED)
+                     .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, this.getHover(description)));
+-            
++
+             if (versionCommand) {
+                 builder.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/version " + description.getName()));
+             }
+-            
+-            if (i != plugins.size() - 1) {
+-                // add separator
+-                builder.append(", ", ComponentBuilder.FormatRetention.NONE);
++
++            count.incrementAndGet();
++            if (count.get() != plugins.size()) {
++                // add separator if it's not the last plugin
++                builder.append(", ").color(net.md_5.bungee.api.ChatColor.GRAY);
+             }
+-        }
+-    
++        });
+         return builder.create();
+     }
++    // Jonakls end - Improved plugins command
+     
+     /**
+      * Formats the hover component for a plugin.
+@@ -86,7 +103,7 @@ public class PluginsCommand extends BukkitCommand {
+      * @return The resulting components.
+      */
+     private BaseComponent[] getHover(PluginDescriptionFile description) {
+-        net.md_5.bungee.api.ChatColor mainColor = net.md_5.bungee.api.ChatColor.YELLOW;
++        net.md_5.bungee.api.ChatColor mainColor = net.md_5.bungee.api.ChatColor.GOLD; // Jonakls start - Changed to GOLD
+         net.md_5.bungee.api.ChatColor secondaryColor = net.md_5.bungee.api.ChatColor.WHITE;
+     
+         ComponentBuilder builder = new ComponentBuilder("Name: ").color(mainColor)
+@@ -129,7 +146,7 @@ public class PluginsCommand extends BukkitCommand {
+         
+         return builder.create();
+     }
+-    // PandaSpigot end
++    // Jonakls end
+ 
+     private String getPluginList() {
+         StringBuilder pluginList = new StringBuilder();

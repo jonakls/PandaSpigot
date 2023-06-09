@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: jonakls <asmot54@hotmail.com>
+Date: Fri, 9 Jun 2023 03:17:37 -0500
+Subject: [PATCH] Add Warn For Add Ops In Server
+
+
+diff --git a/src/main/java/net/minecraft/server/PlayerList.java b/src/main/java/net/minecraft/server/PlayerList.java
+index ada9cf25b091c2df24301bb5e82d1f76fbd929e5..f872ea963b8563846ee0466173ae929c047720ca 100644
+--- a/src/main/java/net/minecraft/server/PlayerList.java
++++ b/src/main/java/net/minecraft/server/PlayerList.java
+@@ -1021,6 +1021,8 @@ public abstract class PlayerList {
+     public void addOp(GameProfile gameprofile) {
+         this.operators.add(new OpListEntry(gameprofile, this.server.p(), this.operators.b(gameprofile)));
+ 
++        this.server.server.getLogger().warning("Added operator " + gameprofile.getName() + " with command"); // Jonakls start - Add warning to console
++
+         // CraftBukkit start
+         Player player = server.server.getPlayer(gameprofile.getId());
+         if (player != null) {
